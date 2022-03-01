@@ -36,4 +36,14 @@ namespace Tasks
         Serial.printf("Error code: %d\n", error_code);
         digitalWrite(output_pin_id, error_code);
     }
+
+    void log(const bool digital_input_state,
+             const Hertz square_wave_frequency,
+             const double filtered_analogue_signal)
+    {
+        Serial.printf("%i,%f,%f\n",
+                      digital_input_state,
+                      square_wave_frequency,
+                      filtered_analogue_signal);
+    }
 }

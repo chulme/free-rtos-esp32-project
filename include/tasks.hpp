@@ -20,6 +20,6 @@ namespace Tasks
                               const int8_t output_pin_id);
     void log(const bool digital_input_state, // Task 9
              const Hertz square_wave_frequency,
-             const uint16_t filtered_analogue_signal);
+             const double filtered_analogue_signal);
 }
 #endif
