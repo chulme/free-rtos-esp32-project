@@ -15,7 +15,7 @@ namespace Tasks
     uint16_t analogue_read(const int8_t input_pin_id);                                        // Task 4
     double compute_filtered_analogue_signal(const std::array<uint16_t, 4> analogue_readings); // Task 5
     void execute_no_op_instruction(const size_t number_of_times);                             // Task 6
-    void visualise_error_code(const uint16_t average_analogue_in,                             // Task 7+8
+    void visualise_error_code(const double average_analogue_in,                               // Task 7+8
                               const uint16_t half_of_maximum_analogue_input_range,
                               const int8_t output_pin_id);
     void log(const bool digital_input_state, // Task 9

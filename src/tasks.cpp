@@ -26,4 +26,14 @@ namespace Tasks
             __asm__ __volatile__("nop");
         }
     }
+
+    void visualise_error_code(const double average_analogue_in,
+                              const uint16_t half_of_maximum_analogue_input_range,
+                              const int8_t output_pin_id)
+    {
+
+        uint8_t error_code = (average_analogue_in > half_of_maximum_analogue_input_range);
+        Serial.printf("Error code: %d\n", error_code);
+        digitalWrite(output_pin_id, error_code);
+    }
 }
