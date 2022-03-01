@@ -7,21 +7,22 @@ namespace Tasks
 
     Hertz measure_square_wave_frequency(const int8_t input_pin_id)
     {
-        unsigned long pulse_duration = pulseIn(input_pin_id, HIGH, TIMEOUT);
-        return (1 / pulse_duration);
+        unsigned long pulse_duration = pulseIn(input_pin_id, HIGH, static_cast<unsigned long>(TIMEOUT));
+        return (pulse_duration == 0) ? 0.0
+                                     : static_cast<Hertz>(1.0 / static_cast<Milliseconds>(pulse_duration));
     }
 
     uint16_t analogue_read(const int8_t input_pin_id)
     {
         uint16_t signal_value = analogRead(input_pin_id);
-        Serial.printf("%lu\t Analogue signal value: %d.\n", millis(), signal_value);
+        Serial.printf("Analogue signal value: %d.\n", signal_value);
         return signal_value;
     }
 
     double compute_filtered_analogue_signal(const std::array<uint16_t, NUMBER_OF_ANALOGUE_READINGS> analogue_readings)
     {
         double average = std::accumulate(analogue_readings.begin(), analogue_readings.end(), 0.0) / NUMBER_OF_ANALOGUE_READINGS;
-        Serial.printf("%lu\t Filtered analogue signal value: %f.\n", millis(), average);
+        Serial.printf("Filtered analogue signal value: %f.\n", average);
         return average;
     }
 
@@ -32,13 +33,17 @@ namespace Tasks
             __asm__ __volatile__("nop");
         }
     }
+    uint8_t compute_error_code(const double average_analogue_in,
+                               const uint16_t maximum_analogue_input_range)
+    {
+        return static_cast<uint8_t>(
+            average_analogue_in >
+            static_cast<double>(maximum_analogue_input_range / 2));
+    }
 
-    void visualise_error_code(const double average_analogue_in,
-                              const uint16_t half_of_maximum_analogue_input_range,
+    void visualise_error_code(const uint8_t error_code,
                               const int8_t output_pin_id)
     {
-
-        uint8_t error_code = (average_analogue_in > half_of_maximum_analogue_input_range);
         Serial.printf("Error code: %d\n", error_code);
         digitalWrite(output_pin_id, error_code);
     }

@@ -3,16 +3,14 @@
 
 #include <cstdint> // fixed-width integer types
 
-typedef int Microseconds;
-typedef int Milliseconds;
+typedef double Microseconds;
+typedef double Milliseconds;
+typedef double Seconds;
+typedef double Hertz;
 
-typedef float Seconds;
-
-/**
- * @brief Convert seconds to microseconds.
- * @param[in] seconds Seconds to convert.
- * @return @p seconds converted to microseconds.
- */
-Microseconds secondsToMicroSeconds(const Seconds seconds);
+constexpr Milliseconds calculateCyclePeriod(const Hertz frequency)
+{
+    return ((1.0 / frequency) * 1000.0);
+}
 
 #endif
