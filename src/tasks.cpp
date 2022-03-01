@@ -5,6 +5,12 @@
 namespace Tasks
 {
 
+    Hertz measure_square_wave_frequency(const int8_t input_pin_id)
+    {
+        unsigned long pulse_duration = pulseIn(input_pin_id, HIGH, TIMEOUT);
+        return (1 / pulse_duration);
+    }
+
     uint16_t analogue_read(const int8_t input_pin_id)
     {
         uint16_t signal_value = analogRead(input_pin_id);

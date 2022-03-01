@@ -8,6 +8,7 @@
 namespace Tasks
 {
     constexpr size_t NUMBER_OF_ANALOGUE_READINGS = 4;
+    static constexpr Milliseconds TIMEOUT = 40;
 
     void toggle_digital_out(const int8_t output_pin_id);                                      // Task 1
     bool digital_read(const int8_t input_pin_id);                                             // Task 2
