@@ -4,6 +4,10 @@
 #include <numeric>
 namespace Tasks
 {
+    bool digital_read(const int8_t input_pin_id)
+    {
+        return digitalRead(input_pin_id);
+    }
 
     Hertz measure_square_wave_frequency(const int8_t input_pin_id)
     {
@@ -50,6 +54,16 @@ namespace Tasks
     {
         Serial.printf("Error code: %d\n", error_code);
         digitalWrite(output_pin_id, error_code);
+    }
+
+    void start_pulse(const int8_t output_pin_id)
+    {
+        digitalWrite(output_pin_id, HIGH);
+    }
+
+    void stop_pulse(const int8_t output_pin_id)
+    {
+        digitalWrite(output_pin_id, HIGH);
     }
 
     void log(const bool digital_input_state,
