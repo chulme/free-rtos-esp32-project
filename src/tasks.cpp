@@ -7,9 +7,13 @@ namespace Tasks
 
     Hertz measure_square_wave_frequency(const int8_t input_pin_id)
     {
-        unsigned long pulse_duration = pulseIn(input_pin_id, HIGH, static_cast<unsigned long>(TIMEOUT));
+
+        Seconds pulse_duration = microsecondsToSeconds(static_cast<double>(pulseIn(input_pin_id,
+                                                                                   HIGH,
+                                                                                   static_cast<unsigned long>(TIMEOUT))));
+
         return (pulse_duration == 0) ? 0.0
-                                     : static_cast<Hertz>(1.0 / static_cast<Milliseconds>(pulse_duration));
+                                     : static_cast<Hertz>(1.0 / (pulse_duration * 2.0)); // Multiply by 2 to get period from pulse duration.
     }
 
     uint16_t analogue_read(const int8_t input_pin_id)

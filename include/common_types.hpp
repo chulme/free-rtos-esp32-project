@@ -8,6 +8,11 @@ typedef double Milliseconds;
 typedef double Seconds;
 typedef double Hertz;
 
+constexpr Seconds microsecondsToSeconds(const Microseconds microseconds)
+{
+    return (microseconds * 1000000.0);
+}
+
 constexpr Milliseconds calculateCyclePeriod(const Hertz frequency)
 {
     return ((1.0 / frequency) * 1000.0);
