@@ -8,7 +8,7 @@
 namespace Tasks
 {
     constexpr size_t NUMBER_OF_ANALOGUE_READINGS = 4;
-    static constexpr Milliseconds TIMEOUT = 5;
+    static constexpr Microseconds TIMEOUT = 4000;
     void start_pulse(const int8_t output_pin_id);
 
     void stop_pulse(const int8_t output_pin_id);
@@ -20,7 +20,7 @@ namespace Tasks
     double compute_filtered_analogue_signal(const std::array<uint16_t, 4> analogue_readings); // Task 5
     void execute_no_op_instruction(const size_t number_of_times);                             // Task 6
 
-    uint8_t compute_error_code(const double average_analogue_in, const uint16_t maximum_analogue_input_range);
+    uint8_t compute_error_code(const double average_analogue_in);
 
     void visualise_error_code(const uint8_t error_code,
                               const int8_t output_pin_id);
