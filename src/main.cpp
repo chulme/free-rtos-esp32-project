@@ -59,23 +59,23 @@ void setup()
      * nearest multiple of the SLOT_WIDTH. This ensures that tasks are executed at
      * approximately the right time, while preventing tasks from being missed due to
      * a mismatch between SLOT_WIDTH and the task's period ie.
-     * 
+     *
      * SLOT_WIDTH = 2ms, TASK_PERIOD=3ms, would result in the task only being executed
      * every 30ms (slot time increments by 2ms, only time 3ms is a multiple of 2ms is every
      * 30ms.)
-     * 
+     *
      * By rounding to the nearest multiple, this issue is resolved:
      * SLOT_WIDTH = 2ms, TASK_PERIOD = 3ms => 2ms
      */
     TASK_1_PERIOD = roundToTheNearestMultiple(TASK_1_PERIOD, SLOT_WIDTH);
-    TASK_2_PERIOD = roundToTheNearestMultiple(calculateCyclePeriod(TASK_2_RATE), SLOT_WIDTH); // 20s
-    TASK_3_PERIOD = roundToTheNearestMultiple(calculateCyclePeriod(TASK_3_RATE), SLOT_WIDTH); // 100
-    TASK_4_PERIOD = roundToTheNearestMultiple(calculateCyclePeriod(TASK_4_RATE), SLOT_WIDTH); // 4.16s
-    TASK_5_PERIOD = roundToTheNearestMultiple(calculateCyclePeriod(TASK_5_RATE), SLOT_WIDTH); // 4.16s
-    TASK_6_PERIOD = roundToTheNearestMultiple(calculateCyclePeriod(TASK_6_RATE), SLOT_WIDTH); // 10s
-    TASK_7_PERIOD = roundToTheNearestMultiple(calculateCyclePeriod(TASK_7_RATE), SLOT_WIDTH); // 33.33s
-    TASK_8_PERIOD = roundToTheNearestMultiple(calculateCyclePeriod(TASK_8_RATE), SLOT_WIDTH); // 33.33s
-    TASK_9_PERIOD = roundToTheNearestMultiple(calculateCyclePeriod(TASK_9_RATE), SLOT_WIDTH); // 5s
+    TASK_2_PERIOD = roundToTheNearestMultiple(calculateCyclePeriod(TASK_2_RATE), SLOT_WIDTH);
+    TASK_3_PERIOD = roundToTheNearestMultiple(calculateCyclePeriod(TASK_3_RATE), SLOT_WIDTH);
+    TASK_4_PERIOD = roundToTheNearestMultiple(calculateCyclePeriod(TASK_4_RATE), SLOT_WIDTH);
+    TASK_5_PERIOD = roundToTheNearestMultiple(calculateCyclePeriod(TASK_5_RATE), SLOT_WIDTH);
+    TASK_6_PERIOD = roundToTheNearestMultiple(calculateCyclePeriod(TASK_6_RATE), SLOT_WIDTH);
+    TASK_7_PERIOD = roundToTheNearestMultiple(calculateCyclePeriod(TASK_7_RATE), SLOT_WIDTH);
+    TASK_8_PERIOD = roundToTheNearestMultiple(calculateCyclePeriod(TASK_8_RATE), SLOT_WIDTH);
+    TASK_9_PERIOD = roundToTheNearestMultiple(calculateCyclePeriod(TASK_9_RATE), SLOT_WIDTH);
     slot_ticker.attach_ms(SLOT_WIDTH, callback);
 }
 
@@ -104,21 +104,21 @@ void callback()
      * if each period is a multiple for the current slot_start_time. If so, the task
      * is executed, otherwise the task is skipped this cycle.
      */
-    if (is_task_slot(slot_start_time, TASK_1_PERIOD)) //Task 1: Watchdog Waveform
+    if (is_task_slot(slot_start_time, TASK_1_PERIOD)) // Task 1: Watchdog Waveform
     {
         Tasks::start_pulse(WATCHDOG_OUTPUT);
         delayMicroseconds(50);
         Tasks::stop_pulse(WATCHDOG_OUTPUT);
     }
-    if (is_task_slot(slot_start_time, TASK_2_PERIOD)) //Task 2: Monitor button
+    if (is_task_slot(slot_start_time, TASK_2_PERIOD)) // Task 2: Monitor button
     {
         digital_input_state = Tasks::digital_read(DIGITAL_INPUT);
     }
-    if (is_task_slot(slot_start_time, TASK_3_PERIOD)) //Task 3: Measure square wave frequency
+    if (is_task_slot(slot_start_time, TASK_3_PERIOD)) // Task 3: Measure square wave frequency
     {
         square_wave_frequency = Tasks::measure_square_wave_frequency(PWM_PIN);
     }
-    if (is_task_slot(slot_start_time, TASK_4_PERIOD)) //Task4: Measure potentiometer voltage
+    if (is_task_slot(slot_start_time, TASK_4_PERIOD)) // Task4: Measure potentiometer voltage
     {
         digitalWrite(ANALOGUE_MONITOR_DISPLAY_PIN, HIGH);
         analogue_readings[analogue_index] = Tasks::analogue_read(ANALOGUE_INPUT);
@@ -126,25 +126,25 @@ void callback()
         analogue_index = (analogue_index + 1) % Tasks::NUMBER_OF_ANALOGUE_READINGS; // circually increment counter
                                                                                     // ie. 0,1,2,3,0,1,2,3...
     }
-    if (is_task_slot(slot_start_time, TASK_5_PERIOD)) //Task 5: Filter analogue signal
+    if (is_task_slot(slot_start_time, TASK_5_PERIOD)) // Task 5: Filter analogue signal
     {
 
         average_analogue_reading = Tasks::compute_filtered_analogue_signal(analogue_readings);
     }
-    if (is_task_slot(slot_start_time, TASK_6_PERIOD)) //Task 6: Execute no operation 1000 times
+    if (is_task_slot(slot_start_time, TASK_6_PERIOD)) // Task 6: Execute no operation 1000 times
     {
         Tasks::execute_no_op_instruction(1000);
     }
-    if (is_task_slot(slot_start_time, TASK_7_PERIOD)) //Task 7: Compute error code
+    if (is_task_slot(slot_start_time, TASK_7_PERIOD)) // Task 7: Compute error code
     {
 
         error_code = Tasks::compute_error_code(average_analogue_reading);
     }
-    if (is_task_slot(slot_start_time, TASK_8_PERIOD)) //Task 8: Visualise error code on LED
+    if (is_task_slot(slot_start_time, TASK_8_PERIOD)) // Task 8: Visualise error code on LED
     {
         Tasks::visualise_error_code(error_code, ERROR_CODE_LED);
     }
-    if (is_task_slot(slot_start_time, TASK_9_PERIOD)) //TAsk 9: Log data to serial port (in CSV format)
+    if (is_task_slot(slot_start_time, TASK_9_PERIOD)) // TAsk 9: Log data to serial port (in CSV format)
     {
         Tasks::log(digital_input_state, square_wave_frequency, average_analogue_reading);
     }
