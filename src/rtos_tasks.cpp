@@ -8,7 +8,6 @@ namespace RtosTasks
 
     static constexpr TickType_t period_to_number_of_ticks_to_sleep(Milliseconds period);
     static auto data_to_log = ProtectedTypes::DataToLog();
-    static uint8_t error_code = 0;
     std::array<uint16_t, Tasks::NUMBER_OF_ANALOGUE_READINGS> analogue_readings = {0, 0, 0, 0};
 
     static constexpr size_t QUEUE_SIZE = 5;
@@ -58,7 +57,7 @@ namespace RtosTasks
     }
     void compute_error_code(void *params)
     {
-        const auto p = *(RtosTaskParams *)params;
+        auto p = *(RtosErrorCodeTaskParams *)params;
 
         for (;;)
         {
@@ -66,18 +65,19 @@ namespace RtosTasks
             // Read without removing front of queue.
             xQueuePeek(avg_analogue_readings,
                        (void *)&filtered_analogue_signal_val, 0);
-            error_code = Tasks::compute_error_code(filtered_analogue_signal_val);
-
+            auto err = Tasks::compute_error_code(filtered_analogue_signal_val);
+            *((RtosErrorCodeTaskParams *)params)->error_code = err; // err;
+            Serial.printf("Calculated error code is now [%d]\n", err);
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }
     void visualise_error_code(void *params)
     {
-        const auto p = *(RtosTaskParams *)params;
+        const auto p = *(RtosErrorCodeTaskParams *)params;
 
         for (;;)
         {
-            Tasks::visualise_error_code(error_code, p.pin_id);
+            Tasks::visualise_error_code(*p.error_code, p.pin_id);
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }

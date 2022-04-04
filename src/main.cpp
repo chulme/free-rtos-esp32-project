@@ -41,6 +41,12 @@ constexpr Milliseconds TASK_7_PERIOD = calculateCyclePeriod(TASK_7_RATE);
 constexpr Milliseconds TASK_8_PERIOD = calculateCyclePeriod(TASK_8_RATE);
 constexpr Milliseconds TASK_9_PERIOD = calculateCyclePeriod(TASK_9_RATE);
 
+static auto error_code = std::make_shared<uint8_t>(4);
+
+auto computeErrorCodeParams = RtosTasks::RtosErrorCodeTaskParams(500.0, error_code);
+
+RtosTasks::RtosErrorCodeTaskParams visualiseErrorCodeParams = {ERROR_CODE_LED, 500.0, error_code};
+
 void setup()
 {
     pinMode(ANALOGUE_INPUT, INPUT);
@@ -82,18 +88,16 @@ void create_rtos_tasks()
                 LOW_PRIORITY,
                 NULL);
 
-    constexpr RtosTasks::RtosTaskParams computeErrorCodeParams = {500.0};
     xTaskCreate(RtosTasks::compute_error_code,
                 "Task 7",
-                4000,
+                10000,
                 (void *)&computeErrorCodeParams,
                 MEDIUM_PRIORITY,
                 NULL);
 
-    constexpr RtosTasks::RtosTaskParams visualiseErrorCodeParams = {ERROR_CODE_LED, 500.0};
     xTaskCreate(RtosTasks::visualise_error_code,
                 "Task 8",
-                4000,
+                10000,
                 (void *)&visualiseErrorCodeParams,
                 MEDIUM_PRIORITY,
                 NULL);
