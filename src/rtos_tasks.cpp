@@ -55,11 +55,12 @@ namespace RtosTasks
     void compute_filtered_analogue_signal(void *params)
     {
         const auto p = *(RtosTaskParams *)params;
-
+        constexpr auto ticks_to_wait = period_to_number_of_ticks_to_sleep(100.0);
         for (;;)
         {
             auto average_analogue_reading = Tasks::compute_filtered_analogue_signal(analogue_readings);
-            xQueueSend(avg_analogue_readings, (void *)&average_analogue_reading, 100);
+            xQueueSend(avg_analogue_readings, (void *)&average_analogue_reading, ticks_to_wait);
+            data_to_log.set_filtered_analogue_signal(average_analogue_reading, ticks_to_wait);
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }
@@ -113,11 +114,14 @@ namespace RtosTasks
         constexpr auto WAIT_TIME = 10.0;
         for (;;)
         {
-            double filtered_analogue_signal_val, square_wave_freq;
             bool digital_input_state;
-            if (data_to_log.get_digital_input_state(digital_input_state, period_to_number_of_ticks_to_sleep(WAIT_TIME)) &&
-                xQueueReceive(avg_analogue_readings, (void *)&filtered_analogue_signal_val, period_to_number_of_ticks_to_sleep(WAIT_TIME)) &&
-                xQueueReceive(square_wave_frequencies, (void *)&square_wave_freq, period_to_number_of_ticks_to_sleep(WAIT_TIME)))
+            Hertz square_wave_freq;
+            double filtered_analogue_signal_val;
+
+            if (data_to_log.get_data(digital_input_state,
+                                     square_wave_freq,
+                                     filtered_analogue_signal_val,
+                                     period_to_number_of_ticks_to_sleep(WAIT_TIME)))
             {
                 Tasks::log(digital_input_state,
                            square_wave_freq,
