@@ -1,6 +1,8 @@
 
 #include <Arduino.h>
+
 #include "rtos_tasks.hpp"
+#include "task_params.hpp"
 #include "tasks.hpp"
 #include "common.hpp"
 namespace RtosTasks
@@ -16,7 +18,7 @@ namespace RtosTasks
 
     void transmit_watchdog_waveform(void *params)
     {
-        const auto p = *(TaskParamsWithPulseDuration *)params;
+        const auto p = *(TaskParams::TaskParamsWithPulseDuration *)params;
 
         for (;;)
         {
@@ -28,7 +30,7 @@ namespace RtosTasks
     }
     void digital_read(void *params)
     {
-        const auto p = *(TaskParams *)params;
+        const auto p = *(TaskParams::TaskParams *)params;
         constexpr auto WAIT_TIME = 10.0;
         for (;;)
         {
@@ -39,7 +41,7 @@ namespace RtosTasks
     }
     void measure_square_wave_frequency(void *params)
     {
-        const auto p = *(TaskParams *)params;
+        const auto p = *(TaskParams::TaskParams *)params;
         constexpr auto ticks_to_wait = period_to_number_of_ticks_to_sleep(100.0);
         for (;;)
         {
@@ -50,7 +52,7 @@ namespace RtosTasks
     }
     void analogue_read(void *params)
     {
-        const auto p = *(TaskParams *)params;
+        const auto p = *(TaskParams::TaskParams *)params;
         static size_t analogue_index = 0;
         std::array<uint16_t, Tasks::NUMBER_OF_ANALOGUE_READINGS> analogue_readings = {0, 0, 0, 0};
 
@@ -64,7 +66,7 @@ namespace RtosTasks
     }
     void compute_filtered_analogue_signal(void *params)
     {
-        const auto p = *(TaskParams *)params;
+        const auto p = *(TaskParams::TaskParams *)params;
         constexpr auto ticks_to_wait = period_to_number_of_ticks_to_sleep(100.0);
         bool isQueueFull = false;
         for (;;)
@@ -94,7 +96,7 @@ namespace RtosTasks
     }
     void execute_no_op_instruction(void *params)
     {
-        const auto p = *(TaskParams *)params;
+        const auto p = *(TaskParams::TaskParams *)params;
         constexpr auto NUMBER_OF_NOP_INSTRUCTIONS = 1000;
 
         for (;;)
@@ -105,7 +107,7 @@ namespace RtosTasks
     }
     void compute_error_code(void *params)
     {
-        auto p = *(TaskParamsWithMailbox *)params;
+        auto p = *(TaskParams::TaskParamsWithMailbox *)params;
 
         for (;;)
         {
@@ -122,7 +124,7 @@ namespace RtosTasks
     }
     void visualise_error_code(void *params)
     {
-        const auto p = *(TaskParams *)params;
+        const auto p = *(TaskParams::TaskParams *)params;
 
         for (;;)
         {
@@ -137,7 +139,7 @@ namespace RtosTasks
 
     void log(void *params)
     {
-        const auto p = *(TaskParams *)params;
+        const auto p = *(TaskParams::TaskParams *)params;
         constexpr auto WAIT_TIME = 10.0;
         for (;;)
         {
