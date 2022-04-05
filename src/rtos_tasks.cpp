@@ -114,13 +114,14 @@ namespace RtosTasks
 
         for (;;)
         {
-            double filtered_analogue_signal_val;
+            double filtered_analogue_signal_val, square_wave_freq;
+
             if (data_to_log.get_digital_input_state().was_able_to_access() &&
-                xQueueReceive(avg_analogue_readings,
-                              (void *)&filtered_analogue_signal_val, 0))
+                xQueueReceive(avg_analogue_readings, (void *)&filtered_analogue_signal_val, 0) &&
+                xQueueReceive(square_wave_frequencies, (void *)&square_wave_freq, 0))
             {
                 Tasks::log(data_to_log.get_digital_input_state().get(),
-                           15.0,
+                           square_wave_freq,
                            filtered_analogue_signal_val);
             }
             else
