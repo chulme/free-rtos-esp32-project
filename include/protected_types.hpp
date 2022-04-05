@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-#include "common_types.hpp"
+#include "common.hpp"
 
 namespace ProtectedTypes
 {

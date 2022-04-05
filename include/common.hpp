@@ -1,6 +1,7 @@
-#ifndef COMMON_TYPES
-#define COMMON_TYPES
+#ifndef COMMON
+#define COMMON
 
+#include <Arduino.h>
 #include <cstdint> // fixed-width integer types
 
 typedef double Microseconds;
