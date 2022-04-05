@@ -15,6 +15,8 @@ namespace RtosTasks
     static constexpr size_t QUEUE_SIZE = 5;
     static QueueHandle_t avg_analogue_readings = xQueueCreate(QUEUE_SIZE,
                                                               sizeof(double));
+    static QueueHandle_t square_wave_frequencies = xQueueCreate(QUEUE_SIZE,
+                                                                sizeof(Hertz));
 
     void toggle_digital_out(void *params)
     {
@@ -31,6 +33,14 @@ namespace RtosTasks
     }
     void measure_square_wave_frequency(void *params)
     {
+        const auto p = *(RtosTaskParams *)params;
+
+        for (;;)
+        {
+            const auto freq = Tasks::measure_square_wave_frequency(p.pin_id);
+            xQueueSend(square_wave_frequencies, (void *)&freq, 100);
+            vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
+        }
     }
     void analogue_read(void *params)
     {

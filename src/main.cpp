@@ -66,6 +66,14 @@ void create_rtos_tasks()
                 LOW_PRIORITY,
                 NULL);
 
+    constexpr RtosTasks::RtosTaskParams measure_square_wave_freq_params = {PWM_PIN, 500.0};
+    xTaskCreate(RtosTasks::measure_square_wave_frequency,
+                "Task 3",
+                4000,
+                (void *)&measure_square_wave_freq_params,
+                LOW_PRIORITY,
+                NULL);
+
     constexpr RtosTasks::RtosTaskParams analogue_read_params = {ANALOGUE_INPUT, 400.0};
     xTaskCreate(RtosTasks::analogue_read,
                 "Task 4",
