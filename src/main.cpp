@@ -107,6 +107,7 @@ void create_rtos_tasks()
                 LOW_PRIORITY,
                 NULL);
 
+    // As Task 7 relies on Task 8's handle being instantiated, Task 7 must be created first.
     constexpr TaskParams::TaskParams visualise_error_code_params = {ERROR_CODE_LED, TASK_8_PERIOD};
     TaskHandle_t visualiseHandle = NULL;
     xTaskCreate(RtosTasks::visualise_error_code,
@@ -135,5 +136,5 @@ void create_rtos_tasks()
 
 void loop()
 {
-    // put your main code here, to run repeatedly:
+    vTaskDelete(NULL); // delete Arduino loop(). FreeRTOS tasks are used instead.
 }
