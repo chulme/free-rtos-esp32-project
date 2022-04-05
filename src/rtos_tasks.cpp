@@ -8,14 +8,23 @@ namespace RtosTasks
 
     static auto data_to_log = ProtectedTypes::DataToLog();
 
-    std::array<uint16_t, Tasks::NUMBER_OF_ANALOGUE_READINGS> analogue_readings = {0, 0, 0, 0};
-
     static constexpr size_t QUEUE_SIZE = 5;
     static QueueHandle_t avg_analogue_readings = xQueueCreate(QUEUE_SIZE,
                                                               sizeof(double));
+    static QueueHandle_t analogue_readings_queue = xQueueCreate(1,
+                                                                sizeof(std::array<uint16_t, Tasks::NUMBER_OF_ANALOGUE_READINGS>));
 
-    void toggle_digital_out(void *params)
+    void transmit_watchdog_waveform(void *params)
     {
+        const auto p = *(WatchdogTaskParams *)params;
+
+        for (;;)
+        {
+            Tasks::start_pulse(p.pin_id);
+            vTaskDelay(period_to_number_of_ticks_to_sleep(p.pulse_duration));
+            Tasks::stop_pulse(p.pin_id);
+            vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
+        }
     }
     void digital_read(void *params)
     {
@@ -43,10 +52,13 @@ namespace RtosTasks
     {
         const auto p = *(RtosTaskParams *)params;
         static size_t analogue_index = 0;
+        std::array<uint16_t, Tasks::NUMBER_OF_ANALOGUE_READINGS> analogue_readings = {0, 0, 0, 0};
+
         for (;;)
         {
             analogue_readings[analogue_index] = Tasks::analogue_read(p.pin_id);
             analogue_index = (analogue_index + 1) % Tasks::NUMBER_OF_ANALOGUE_READINGS; // circually increment counter
+            xQueueOverwrite(analogue_readings_queue, (void *)&analogue_readings);
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }
@@ -56,9 +68,14 @@ namespace RtosTasks
         constexpr auto ticks_to_wait = period_to_number_of_ticks_to_sleep(100.0);
         for (;;)
         {
-            auto average_analogue_reading = Tasks::compute_filtered_analogue_signal(analogue_readings);
-            xQueueSend(avg_analogue_readings, (void *)&average_analogue_reading, ticks_to_wait);
-            data_to_log.set_filtered_analogue_signal(average_analogue_reading, ticks_to_wait);
+            std::array<uint16_t, Tasks::NUMBER_OF_ANALOGUE_READINGS> analogue_readings;
+
+            if (xQueueReceive(analogue_readings_queue, (void *)&analogue_readings, ticks_to_wait))
+            {
+                auto average_analogue_reading = Tasks::compute_filtered_analogue_signal(analogue_readings);
+                xQueueSend(avg_analogue_readings, (void *)&average_analogue_reading, ticks_to_wait);
+                data_to_log.set_filtered_analogue_signal(average_analogue_reading, ticks_to_wait);
+            }
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }
