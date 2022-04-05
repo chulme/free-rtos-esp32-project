@@ -6,6 +6,7 @@
 
 #include "common_types.hpp"
 #include "protected_types.hpp"
+#include <set>
 namespace RtosTasks
 {
 
@@ -22,6 +23,17 @@ namespace RtosTasks
         RtosTaskParams() = delete;
     };
 
+    struct MailboxParams : public RtosTaskParams
+    {
+        MailboxParams(const uint8_t pin_id,
+                      const Milliseconds task_period,
+                      const std::set<TaskHandle_t> tasks)
+            : RtosTaskParams(pin_id, task_period),
+              tasks(tasks)
+        {
+        }
+        const std::set<TaskHandle_t> tasks;
+    };
     struct RtosErrorCodeTaskParams : public RtosTaskParams
     {
         RtosErrorCodeTaskParams(const uint8_t pin_id,

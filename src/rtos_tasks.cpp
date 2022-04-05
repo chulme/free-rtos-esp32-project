@@ -7,7 +7,9 @@ namespace RtosTasks
 {
 
     static constexpr TickType_t period_to_number_of_ticks_to_sleep(Milliseconds period);
+
     static auto data_to_log = ProtectedTypes::DataToLog();
+
     std::array<uint16_t, Tasks::NUMBER_OF_ANALOGUE_READINGS> analogue_readings = {0, 0, 0, 0};
 
     static constexpr size_t QUEUE_SIZE = 5;
@@ -57,30 +59,37 @@ namespace RtosTasks
     }
     void compute_error_code(void *params)
     {
-        auto p = *(RtosErrorCodeTaskParams *)params;
+        auto p = *(MailboxParams *)params;
 
         for (;;)
         {
             double filtered_analogue_signal_val;
             // Read without removing front of queue.
-            xQueuePeek(avg_analogue_readings,
-                       (void *)&filtered_analogue_signal_val, 0);
-            auto err = Tasks::compute_error_code(filtered_analogue_signal_val);
-            *((RtosErrorCodeTaskParams *)params)->error_code = err; // err;
-            Serial.printf("Calculated error code is now [%d]\n", err);
+            xQueuePeek(avg_analogue_readings, (void *)&filtered_analogue_signal_val, 0);
+            const auto err = Tasks::compute_error_code(filtered_analogue_signal_val);
+            
+            Serial.printf("Sending error code %d\n", err);
+            for (const auto &task : p.tasks)
+                xTaskNotify(task, static_cast<uint32_t>(err), eSetValueWithOverwrite);
+
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }
     void visualise_error_code(void *params)
     {
-        const auto p = *(RtosErrorCodeTaskParams *)params;
+        const auto p = *(RtosTaskParams *)params;
 
         for (;;)
         {
-            Tasks::visualise_error_code(*p.error_code, p.pin_id);
+            uint32_t err_code;
+            if (xTaskNotifyWait(0, 0, &err_code, 0))
+            {
+                Tasks::visualise_error_code(static_cast<uint8_t>(err_code), p.pin_id);
+            }
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }
+
     void log(void *params)
     {
         const auto p = *(RtosTaskParams *)params;
