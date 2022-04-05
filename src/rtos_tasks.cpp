@@ -56,6 +56,14 @@ namespace RtosTasks
     }
     void execute_no_op_instruction(void *params)
     {
+        const auto p = *(RtosTaskParams *)params;
+        constexpr auto NUMBER_OF_NOP_INSTRUCTIONS = 1000;
+
+        for (;;)
+        {
+            Tasks::execute_no_op_instruction(NUMBER_OF_NOP_INSTRUCTIONS);
+            vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
+        }
     }
     void compute_error_code(void *params)
     {
@@ -67,7 +75,7 @@ namespace RtosTasks
             // Read without removing front of queue.
             xQueuePeek(avg_analogue_readings, (void *)&filtered_analogue_signal_val, 0);
             const auto err = Tasks::compute_error_code(filtered_analogue_signal_val);
-            
+
             Serial.printf("Sending error code %d\n", err);
             for (const auto &task : p.tasks)
                 xTaskNotify(task, static_cast<uint32_t>(err), eSetValueWithOverwrite);

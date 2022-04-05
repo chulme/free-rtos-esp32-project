@@ -82,6 +82,14 @@ void create_rtos_tasks()
                 LOW_PRIORITY,
                 NULL);
 
+    constexpr RtosTasks::RtosTaskParams noOpParams = {1000.0};
+    xTaskCreate(RtosTasks::execute_no_op_instruction,
+                "Task 6",
+                100000,
+                (void *)&noOpParams,
+                LOW_PRIORITY,
+                NULL);
+
     constexpr RtosTasks::RtosTaskParams visualiseErrorCodeParams = {ERROR_CODE_LED, 550.0};
     TaskHandle_t visualiseHandle = NULL;
     xTaskCreate(RtosTasks::visualise_error_code,
