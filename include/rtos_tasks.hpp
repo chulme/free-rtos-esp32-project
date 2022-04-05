@@ -34,23 +34,18 @@ namespace RtosTasks
         }
         const std::set<TaskHandle_t> tasks;
     };
-    struct RtosErrorCodeTaskParams : public RtosTaskParams
+    struct WatchdogTaskParams : public RtosTaskParams
     {
-        RtosErrorCodeTaskParams(const uint8_t pin_id,
-                                const Milliseconds task_period,
-                                std::shared_ptr<uint8_t> error_code)
+        constexpr WatchdogTaskParams(const uint8_t pin_id,
+                                     const Milliseconds task_period,
+                                     const Milliseconds pulse_duration)
             : RtosTaskParams(pin_id, task_period),
-              error_code(error_code) {}
+              pulse_duration(pulse_duration) {}
 
-        RtosErrorCodeTaskParams(const Milliseconds task_periodin,
-                                std::shared_ptr<uint8_t> error_code)
-            : RtosTaskParams(pin_id, task_periodin),
-              error_code(error_code) { Serial.printf("Executed the correct constructor, with a period of %f\n", task_period); }
-
-        std::shared_ptr<uint8_t> error_code;
+        const Milliseconds pulse_duration;
     };
 
-    void toggle_digital_out(void *params);               // Task 1
+    void transmit_watchdog_waveform(void *params);       // Task 1
     void digital_read(void *params);                     // Task 2
     void measure_square_wave_frequency(void *params);    // Task 3
     void analogue_read(void *params);                    // Task 4

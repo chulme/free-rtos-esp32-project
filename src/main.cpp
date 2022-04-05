@@ -58,6 +58,14 @@ void setup()
 
 void create_rtos_tasks()
 {
+    constexpr RtosTasks::WatchdogTaskParams watchdog_params = {WATCHDOG_OUTPUT, 500.0, 50};
+    xTaskCreate(RtosTasks::transmit_watchdog_waveform,
+                "Task 1",
+                4000,
+                (void *)&watchdog_params,
+                LOW_PRIORITY,
+                NULL);
+
     constexpr RtosTasks::RtosTaskParams button_read_params = {DIGITAL_INPUT, 500.0};
     xTaskCreate(RtosTasks::digital_read,
                 "Task 2",
