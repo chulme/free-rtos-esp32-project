@@ -138,9 +138,10 @@ namespace RtosTasks
                                      filtered_analogue_signal_val,
                                      period_to_number_of_ticks_to_sleep(WAIT_TIME)))
             {
-                Tasks::log(digital_input_state,
-                           square_wave_freq,
-                           filtered_analogue_signal_val);
+                if (digital_input_state)
+                    Tasks::log(digital_input_state,
+                               square_wave_freq,
+                               filtered_analogue_signal_val);
             }
             else
             {
