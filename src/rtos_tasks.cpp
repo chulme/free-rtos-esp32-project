@@ -2,11 +2,9 @@
 #include <Arduino.h>
 #include "rtos_tasks.hpp"
 #include "tasks.hpp"
-
+#include "common_types.hpp"
 namespace RtosTasks
 {
-
-    static constexpr TickType_t period_to_number_of_ticks_to_sleep(Milliseconds period);
 
     static auto data_to_log = ProtectedTypes::DataToLog();
 
@@ -24,10 +22,11 @@ namespace RtosTasks
     void digital_read(void *params)
     {
         const auto p = *(RtosTaskParams *)params;
+        constexpr auto WAIT_TIME = 10.0;
         for (;;)
         {
             const auto button_pressed = Tasks::digital_read(p.pin_id);
-            data_to_log.set_digital_input_state(button_pressed);
+            data_to_log.set_digital_input_state(button_pressed, period_to_number_of_ticks_to_sleep(WAIT_TIME));
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }
@@ -86,7 +85,7 @@ namespace RtosTasks
             xQueuePeek(avg_analogue_readings, (void *)&filtered_analogue_signal_val, 0);
             const auto err = Tasks::compute_error_code(filtered_analogue_signal_val);
 
-            Serial.printf("Sending error code %d\n", err);
+            // Serial.printf("Sending error code %d\n", err);
             for (const auto &task : p.tasks)
                 xTaskNotify(task, static_cast<uint32_t>(err), eSetValueWithOverwrite);
 
@@ -111,16 +110,16 @@ namespace RtosTasks
     void log(void *params)
     {
         const auto p = *(RtosTaskParams *)params;
-
+        constexpr auto WAIT_TIME = 10.0;
         for (;;)
         {
             double filtered_analogue_signal_val, square_wave_freq;
 
-            if (data_to_log.get_digital_input_state().was_able_to_access() &&
-                xQueueReceive(avg_analogue_readings, (void *)&filtered_analogue_signal_val, 0) &&
-                xQueueReceive(square_wave_frequencies, (void *)&square_wave_freq, 0))
+            if (data_to_log.get_digital_input_state(period_to_number_of_ticks_to_sleep(WAIT_TIME)).was_able_to_access() &&
+                xQueueReceive(avg_analogue_readings, (void *)&filtered_analogue_signal_val, period_to_number_of_ticks_to_sleep(WAIT_TIME)) &&
+                xQueueReceive(square_wave_frequencies, (void *)&square_wave_freq, period_to_number_of_ticks_to_sleep(WAIT_TIME)))
             {
-                Tasks::log(data_to_log.get_digital_input_state().get(),
+                Tasks::log(data_to_log.get_digital_input_state(period_to_number_of_ticks_to_sleep(WAIT_TIME)).get(),
                            square_wave_freq,
                            filtered_analogue_signal_val);
             }
@@ -132,8 +131,4 @@ namespace RtosTasks
         }
     }
 
-    static constexpr TickType_t period_to_number_of_ticks_to_sleep(Milliseconds period)
-    {
-        return static_cast<TickType_t>(period / portTICK_PERIOD_MS);
-    }
 }

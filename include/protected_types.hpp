@@ -46,9 +46,9 @@ namespace ProtectedTypes
                       square_wave_frequency(0.0),
                       filtered_analogue_signal(0.0) {}
 
-        bool set_digital_input_state(const bool digital_in_state)
+        bool set_digital_input_state(const bool digital_in_state, const TickType_t semaphore_ticks_to_wait)
         {
-            if (xSemaphoreTake(semaphore, semaphore_block_time))
+            if (xSemaphoreTake(semaphore, semaphore_ticks_to_wait))
             {
                 digital_input_state = digital_in_state;
                 xSemaphoreGive(semaphore);
@@ -60,9 +60,9 @@ namespace ProtectedTypes
             }
         }
 
-        ProtectedOptional<bool> get_digital_input_state() const
+        ProtectedOptional<bool> get_digital_input_state(const TickType_t semaphore_ticks_to_wait) const
         {
-            if (xSemaphoreTake(semaphore, semaphore_block_time))
+            if (xSemaphoreTake(semaphore, semaphore_ticks_to_wait))
             {
                 const auto digital_in_state = ProtectedOptional<bool>(digital_input_state);
                 xSemaphoreGive(semaphore);
@@ -75,7 +75,6 @@ namespace ProtectedTypes
         bool digital_input_state;
         Hertz square_wave_frequency;
         double filtered_analogue_signal;
-        static constexpr Milliseconds semaphore_block_time = 100.0;
 
         xSemaphoreHandle semaphore = xSemaphoreCreateMutex();
     };
