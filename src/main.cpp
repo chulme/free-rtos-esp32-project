@@ -32,14 +32,14 @@ constexpr int8_t MEDIUM_PRIORITY = 2;
 constexpr int8_t HIGH_PRIORITY = 3;
 
 constexpr Milliseconds TASK_1_PERIOD = 24.4 * DEBUG_RATE_AMPLIFIER;
-constexpr Milliseconds TASK_2_PERIOD = calculateCyclePeriod(TASK_2_RATE);
-constexpr Milliseconds TASK_3_PERIOD = calculateCyclePeriod(TASK_3_RATE);
-constexpr Milliseconds TASK_4_PERIOD = calculateCyclePeriod(TASK_4_RATE);
-constexpr Milliseconds TASK_5_PERIOD = calculateCyclePeriod(TASK_5_RATE);
-constexpr Milliseconds TASK_6_PERIOD = calculateCyclePeriod(TASK_6_RATE);
-constexpr Milliseconds TASK_7_PERIOD = calculateCyclePeriod(TASK_7_RATE);
-constexpr Milliseconds TASK_8_PERIOD = calculateCyclePeriod(TASK_8_RATE);
-constexpr Milliseconds TASK_9_PERIOD = calculateCyclePeriod(TASK_9_RATE);
+constexpr Milliseconds TASK_2_PERIOD = calculateCyclePeriodMs(TASK_2_RATE);
+constexpr Milliseconds TASK_3_PERIOD = calculateCyclePeriodMs(TASK_3_RATE);
+constexpr Milliseconds TASK_4_PERIOD = calculateCyclePeriodMs(TASK_4_RATE);
+constexpr Milliseconds TASK_5_PERIOD = calculateCyclePeriodMs(TASK_5_RATE);
+constexpr Milliseconds TASK_6_PERIOD = calculateCyclePeriodMs(TASK_6_RATE);
+constexpr Milliseconds TASK_7_PERIOD = calculateCyclePeriodMs(TASK_7_RATE);
+constexpr Milliseconds TASK_8_PERIOD = calculateCyclePeriodMs(TASK_8_RATE);
+constexpr Milliseconds TASK_9_PERIOD = calculateCyclePeriodMs(TASK_9_RATE);
 
 void setup()
 {
