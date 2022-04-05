@@ -58,60 +58,60 @@ void setup()
 
 void create_rtos_tasks()
 {
-    constexpr RtosTasks::RtosTaskParams buttonReadParams = {DIGITAL_INPUT, 500.0};
+    constexpr RtosTasks::RtosTaskParams button_read_params = {DIGITAL_INPUT, 500.0};
     xTaskCreate(RtosTasks::digital_read,
                 "Task 2",
                 4000,
-                (void *)&buttonReadParams,
+                (void *)&button_read_params,
                 LOW_PRIORITY,
                 NULL);
 
-    constexpr RtosTasks::RtosTaskParams analogueReadParams = {ANALOGUE_INPUT, 400.0};
+    constexpr RtosTasks::RtosTaskParams analogue_read_params = {ANALOGUE_INPUT, 400.0};
     xTaskCreate(RtosTasks::analogue_read,
                 "Task 4",
                 100000,
-                (void *)&analogueReadParams,
+                (void *)&analogue_read_params,
                 LOW_PRIORITY,
                 NULL);
 
-    constexpr RtosTasks::RtosTaskParams filterAnalogueSignalParams = {1000.0};
+    constexpr RtosTasks::RtosTaskParams filter_analogue_signal_params = {1000.0};
     xTaskCreate(RtosTasks::compute_filtered_analogue_signal,
                 "Task 5",
                 100000,
-                (void *)&filterAnalogueSignalParams,
+                (void *)&filter_analogue_signal_params,
                 LOW_PRIORITY,
                 NULL);
 
-    constexpr RtosTasks::RtosTaskParams noOpParams = {1000.0};
+    constexpr RtosTasks::RtosTaskParams no_op_params = {1000.0};
     xTaskCreate(RtosTasks::execute_no_op_instruction,
                 "Task 6",
                 100000,
-                (void *)&noOpParams,
+                (void *)&no_op_params,
                 LOW_PRIORITY,
                 NULL);
 
-    constexpr RtosTasks::RtosTaskParams visualiseErrorCodeParams = {ERROR_CODE_LED, 550.0};
+    constexpr RtosTasks::RtosTaskParams visualise_error_code_params = {ERROR_CODE_LED, 550.0};
     TaskHandle_t visualiseHandle = NULL;
     xTaskCreate(RtosTasks::visualise_error_code,
                 "Task 8",
                 10000,
-                (void *)&visualiseErrorCodeParams,
+                (void *)&visualise_error_code_params,
                 4,
                 &visualiseHandle);
 
-    RtosTasks::MailboxParams computeErrorCodeParams = {ERROR_CODE_LED, 120.0, {visualiseHandle}};
+    RtosTasks::MailboxParams compute_error_code_params = {ERROR_CODE_LED, 120.0, {visualiseHandle}};
     xTaskCreate(RtosTasks::compute_error_code,
                 "Task 7",
                 10000,
-                (void *)&computeErrorCodeParams,
+                (void *)&compute_error_code_params,
                 5,
                 NULL);
 
-    constexpr RtosTasks::RtosTaskParams logParams = {500.0};
+    constexpr RtosTasks::RtosTaskParams log_params = {500.0};
     xTaskCreate(RtosTasks::log,
                 "Task 9",
                 4000,
-                (void *)&logParams,
+                (void *)&log_params,
                 MEDIUM_PRIORITY,
                 NULL);
 }
