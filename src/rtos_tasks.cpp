@@ -66,6 +66,7 @@ namespace RtosTasks
     {
         const auto p = *(RtosTaskParams *)params;
         constexpr auto ticks_to_wait = period_to_number_of_ticks_to_sleep(100.0);
+        bool isQueueFull = false;
         for (;;)
         {
             std::array<uint16_t, Tasks::NUMBER_OF_ANALOGUE_READINGS> analogue_readings;
@@ -73,7 +74,19 @@ namespace RtosTasks
             if (xQueueReceive(analogue_readings_queue, (void *)&analogue_readings, ticks_to_wait))
             {
                 auto average_analogue_reading = Tasks::compute_filtered_analogue_signal(analogue_readings);
-                xQueueSend(avg_analogue_readings, (void *)&average_analogue_reading, ticks_to_wait);
+
+                if (isQueueFull)
+                {
+                    double _ignored;
+                    xQueueReceive(avg_analogue_readings, (void *)&_ignored, 0);
+                    xQueueSend(avg_analogue_readings, (void *)&average_analogue_reading, 0);
+                }
+                else
+                {
+                    xQueueSend(avg_analogue_readings, (void *)&average_analogue_reading, 0);
+                    isQueueFull = static_cast<bool>(!uxQueueSpacesAvailable(avg_analogue_readings));
+                    Serial.printf("Queue is full? : %d\n", isQueueFull);
+                }
                 data_to_log.set_filtered_analogue_signal(average_analogue_reading, ticks_to_wait);
             }
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
@@ -97,14 +110,13 @@ namespace RtosTasks
         for (;;)
         {
             double filtered_analogue_signal_val;
-            // Read without removing front of queue.
-            xQueuePeek(avg_analogue_readings, (void *)&filtered_analogue_signal_val, 0);
-            const auto err = Tasks::compute_error_code(filtered_analogue_signal_val);
+            if (xQueuePeek(avg_analogue_readings, (void *)&filtered_analogue_signal_val, 0))
+            {
+                const auto err = Tasks::compute_error_code(filtered_analogue_signal_val);
 
-            // Serial.printf("Sending error code %d\n", err);
-            for (const auto &task : p.tasks)
-                xTaskNotify(task, static_cast<uint32_t>(err), eSetValueWithOverwrite);
-
+                for (const auto &task : p.tasks)
+                    xTaskNotify(task, static_cast<uint32_t>(err), eSetValueWithOverwrite);
+            }
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }
