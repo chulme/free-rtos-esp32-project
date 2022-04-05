@@ -7,32 +7,6 @@
 
 namespace ProtectedTypes
 {
-    /**
-     * Mimics C++17 Optional class, to be used to optionally return some type T.
-     */
-    template <typename T>
-    class ProtectedOptional
-    {
-    public:
-        // Have value, therefore set access to true.
-        ProtectedOptional(const T t) : t(t), access(true){};
-        // Do not value, therefore set access to false.
-        ProtectedOptional() : t(nullptr), access(false){};
-
-        const bool was_able_to_access() const
-        {
-            return access;
-        }
-
-        const T get() const
-        {
-            return t;
-        }
-
-    private:
-        T t;
-        bool access;
-    };
 
     class DataToLog
     {
