@@ -58,7 +58,7 @@ void setup()
 
 void create_rtos_tasks()
 {
-    constexpr RtosTasks::WatchdogTaskParams watchdog_params = {WATCHDOG_OUTPUT, TASK_1_PERIOD, 50};
+    constexpr RtosTasks::TaskParamsWithPulseDuration watchdog_params = {WATCHDOG_OUTPUT, TASK_1_PERIOD, 50};
     xTaskCreate(RtosTasks::transmit_watchdog_waveform,
                 "Task 1",
                 4000,
@@ -66,7 +66,7 @@ void create_rtos_tasks()
                 LOW_PRIORITY,
                 NULL);
 
-    constexpr RtosTasks::RtosTaskParams button_read_params = {DIGITAL_INPUT, TASK_2_PERIOD};
+    constexpr RtosTasks::TaskParams button_read_params = {DIGITAL_INPUT, TASK_2_PERIOD};
     xTaskCreate(RtosTasks::digital_read,
                 "Task 2",
                 4000,
@@ -74,7 +74,7 @@ void create_rtos_tasks()
                 LOW_PRIORITY,
                 NULL);
 
-    constexpr RtosTasks::RtosTaskParams measure_square_wave_freq_params = {PWM_PIN, TASK_3_PERIOD};
+    constexpr RtosTasks::TaskParams measure_square_wave_freq_params = {PWM_PIN, TASK_3_PERIOD};
     xTaskCreate(RtosTasks::measure_square_wave_frequency,
                 "Task 3",
                 4000,
@@ -82,7 +82,7 @@ void create_rtos_tasks()
                 LOW_PRIORITY,
                 NULL);
 
-    constexpr RtosTasks::RtosTaskParams analogue_read_params = {ANALOGUE_INPUT, TASK_4_PERIOD};
+    constexpr RtosTasks::TaskParams analogue_read_params = {ANALOGUE_INPUT, TASK_4_PERIOD};
     xTaskCreate(RtosTasks::analogue_read,
                 "Task 4",
                 100000,
@@ -90,7 +90,7 @@ void create_rtos_tasks()
                 LOW_PRIORITY,
                 NULL);
 
-    constexpr RtosTasks::RtosTaskParams filter_analogue_signal_params = {TASK_5_PERIOD};
+    constexpr RtosTasks::TaskParams filter_analogue_signal_params = {TASK_5_PERIOD};
     xTaskCreate(RtosTasks::compute_filtered_analogue_signal,
                 "Task 5",
                 100000,
@@ -98,7 +98,7 @@ void create_rtos_tasks()
                 LOW_PRIORITY,
                 NULL);
 
-    constexpr RtosTasks::RtosTaskParams no_op_params = {TASK_6_PERIOD};
+    constexpr RtosTasks::TaskParams no_op_params = {TASK_6_PERIOD};
     xTaskCreate(RtosTasks::execute_no_op_instruction,
                 "Task 6",
                 100000,
@@ -106,7 +106,7 @@ void create_rtos_tasks()
                 LOW_PRIORITY,
                 NULL);
 
-    constexpr RtosTasks::RtosTaskParams visualise_error_code_params = {ERROR_CODE_LED, TASK_8_PERIOD};
+    constexpr RtosTasks::TaskParams visualise_error_code_params = {ERROR_CODE_LED, TASK_8_PERIOD};
     TaskHandle_t visualiseHandle = NULL;
     xTaskCreate(RtosTasks::visualise_error_code,
                 "Task 8",
@@ -115,7 +115,7 @@ void create_rtos_tasks()
                 4,
                 &visualiseHandle);
 
-    RtosTasks::MailboxParams compute_error_code_params = {ERROR_CODE_LED, TASK_7_PERIOD, {visualiseHandle}};
+    RtosTasks::TaskParamsWithMailbox compute_error_code_params = {ERROR_CODE_LED, TASK_7_PERIOD, {visualiseHandle}};
     xTaskCreate(RtosTasks::compute_error_code,
                 "Task 7",
                 10000,
@@ -123,7 +123,7 @@ void create_rtos_tasks()
                 5,
                 NULL);
 
-    constexpr RtosTasks::RtosTaskParams log_params = {TASK_9_PERIOD};
+    constexpr RtosTasks::TaskParams log_params = {TASK_9_PERIOD};
     xTaskCreate(RtosTasks::log,
                 "Task 9",
                 4000,

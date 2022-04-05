@@ -10,39 +10,40 @@
 namespace RtosTasks
 {
 
-    struct RtosTaskParams
+    struct TaskParams
     {
         const int8_t pin_id;
         const Milliseconds task_period;
 
-        constexpr RtosTaskParams(const int8_t pin_id, const Milliseconds task_period)
+        constexpr TaskParams(const int8_t pin_id, const Milliseconds task_period)
             : pin_id(pin_id), task_period(task_period) {}
 
-        constexpr RtosTaskParams(const Milliseconds task_period)
+        constexpr TaskParams(const Milliseconds task_period)
             : pin_id(0), task_period(task_period) {}
-        RtosTaskParams() = delete;
+
+        TaskParams() = delete;
     };
 
-    struct MailboxParams : public RtosTaskParams
+    struct TaskParamsWithMailbox : public TaskParams
     {
-        MailboxParams(const uint8_t pin_id,
-                      const Milliseconds task_period,
-                      const std::set<TaskHandle_t> tasks)
-            : RtosTaskParams(pin_id, task_period),
-              tasks(tasks)
-        {
-        }
         const std::set<TaskHandle_t> tasks;
-    };
-    struct WatchdogTaskParams : public RtosTaskParams
-    {
-        constexpr WatchdogTaskParams(const uint8_t pin_id,
-                                     const Milliseconds task_period,
-                                     const Milliseconds pulse_duration)
-            : RtosTaskParams(pin_id, task_period),
-              pulse_duration(pulse_duration) {}
 
+        TaskParamsWithMailbox(const uint8_t pin_id,
+                              const Milliseconds task_period,
+                              const std::set<TaskHandle_t> tasks)
+            : TaskParams(pin_id, task_period),
+              tasks(tasks) {}
+    };
+
+    struct TaskParamsWithPulseDuration : public TaskParams
+    {
         const Milliseconds pulse_duration;
+
+        constexpr TaskParamsWithPulseDuration(const uint8_t pin_id,
+                                              const Milliseconds task_period,
+                                              const Milliseconds pulse_duration)
+            : TaskParams(pin_id, task_period),
+              pulse_duration(pulse_duration) {}
     };
 
     void transmit_watchdog_waveform(void *params);       // Task 1
