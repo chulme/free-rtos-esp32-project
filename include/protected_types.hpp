@@ -60,15 +60,15 @@ namespace ProtectedTypes
             }
         }
 
-        ProtectedOptional<bool> get_digital_input_state(const TickType_t semaphore_ticks_to_wait) const
+        [[no_discard]] bool get_digital_input_state(bool &digital_in_state, const TickType_t semaphore_ticks_to_wait) const
         {
             if (xSemaphoreTake(semaphore, semaphore_ticks_to_wait))
             {
-                const auto digital_in_state = ProtectedOptional<bool>(digital_input_state);
+                digital_in_state = digital_input_state;
                 xSemaphoreGive(semaphore);
-                return digital_in_state;
+                return true;
             }
-            return ProtectedOptional<bool>();
+            return false;
         }
 
     private:
