@@ -46,13 +46,12 @@ void setup()
 {
     pinMode(ANALOGUE_INPUT, INPUT);
     pinMode(WATCHDOG_OUTPUT, OUTPUT);
-    pinMode(DIGITAL_INPUT, INPUT);
+    pinMode(DIGITAL_INPUT, INPUT_PULLDOWN);
     pinMode(PWM_PIN, INPUT);
     pinMode(ERROR_CODE_LED, OUTPUT);
     pinMode(ANALOGUE_MONITOR_DISPLAY_PIN, OUTPUT);
 
     Serial.begin(115200);
-    Serial.println("Cyclic Executive setup complete!");
 
     create_rtos_tasks();
 }
