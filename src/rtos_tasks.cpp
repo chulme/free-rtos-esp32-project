@@ -23,7 +23,7 @@ namespace RtosTasks
         for (;;)
         {
             Tasks::start_pulse(p.pin_id);
-            vTaskDelay(period_to_number_of_ticks_to_sleep(p.pulse_duration));
+            vTaskDelay(period_to_number_of_ticks_to_sleep(p.pulse_duration)); // investigate delaying for microseconds
             Tasks::stop_pulse(p.pin_id);
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
@@ -76,7 +76,11 @@ namespace RtosTasks
             if (xQueueReceive(analogue_readings_queue, (void *)&analogue_readings, ticks_to_wait))
             {
                 auto average_analogue_reading = Tasks::compute_filtered_analogue_signal(analogue_readings);
-
+                /**
+                 * Circularly send data to queue (if full, remove oldest/front of queue and append element to back)
+                 * This decouples sending-receiving of data - does not require receiving task to pop the front of the queue,
+                 * the receiver only needs to know that the data exists, and shall not be responsible for managing it too.
+                 */
                 if (isQueueFull)
                 {
                     double _ignored;
@@ -87,13 +91,13 @@ namespace RtosTasks
                 {
                     xQueueSend(avg_analogue_readings, (void *)&average_analogue_reading, 0);
                     isQueueFull = static_cast<bool>(!uxQueueSpacesAvailable(avg_analogue_readings));
-                    Serial.printf("Queue is full? : %d\n", isQueueFull);
                 }
                 data_to_log.set_filtered_analogue_signal(average_analogue_reading, ticks_to_wait);
             }
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }
+
     void execute_no_op_instruction(void *params)
     {
         const auto p = *(TaskParams::TaskParams *)params;
@@ -105,6 +109,7 @@ namespace RtosTasks
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }
+
     void compute_error_code(void *params)
     {
         auto p = *(TaskParams::TaskParamsWithMailbox *)params;
@@ -122,6 +127,7 @@ namespace RtosTasks
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }
+
     void visualise_error_code(void *params)
     {
         const auto p = *(TaskParams::TaskParams *)params;
