@@ -21,7 +21,7 @@ constexpr Milliseconds calculateCyclePeriodMs(const Hertz frequency)
 
 constexpr TickType_t period_to_number_of_ticks_to_sleep(Milliseconds period)
 {
-    return static_cast<TickType_t>(period / portTICK_PERIOD_MS);
+    return static_cast<TickType_t>(period / static_cast<double>(portTICK_PERIOD_MS));
 }
 
 #endif
