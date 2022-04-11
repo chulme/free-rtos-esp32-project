@@ -15,10 +15,10 @@ constexpr int8_t ANALOGUE_INPUT = 4;
 constexpr int8_t WATCHDOG_OUTPUT = 21;
 constexpr int8_t DIGITAL_INPUT = 19;
 constexpr int8_t ERROR_CODE_LED = 15;
-constexpr int8_t PWM_PIN = 16;
+constexpr int8_t PWM_PIN = 2;
 constexpr int8_t ANALOGUE_MONITOR_DISPLAY_PIN = 22;
 // Task Frequency
-constexpr Hertz DEBUG_RATE_AMPLIFIER = 10;
+constexpr Hertz DEBUG_RATE_AMPLIFIER = 1;
 constexpr Hertz TASK_2_RATE = 5.0 * DEBUG_RATE_AMPLIFIER;
 constexpr Hertz TASK_3_RATE = 1.0 * DEBUG_RATE_AMPLIFIER;
 constexpr Hertz TASK_4_RATE = 24.0 * DEBUG_RATE_AMPLIFIER;
@@ -61,7 +61,7 @@ void create_rtos_tasks()
     constexpr TaskParams::TaskParamsWithPulseDuration watchdog_params = {WATCHDOG_OUTPUT, TASK_1_PERIOD, 50};
     xTaskCreate(RtosTasks::transmit_watchdog_waveform,
                 "Task 1",
-                4000,
+                1648,
                 (void *)&watchdog_params,
                 LOW_PRIORITY,
                 NULL);
@@ -69,7 +69,7 @@ void create_rtos_tasks()
     constexpr TaskParams::TaskParams button_read_params = {DIGITAL_INPUT, TASK_2_PERIOD};
     xTaskCreate(RtosTasks::digital_read,
                 "Task 2",
-                4000,
+                1548,
                 (void *)&button_read_params,
                 LOW_PRIORITY,
                 NULL);
@@ -77,15 +77,15 @@ void create_rtos_tasks()
     constexpr TaskParams::TaskParams measure_square_wave_freq_params = {PWM_PIN, TASK_3_PERIOD};
     xTaskCreate(RtosTasks::measure_square_wave_frequency,
                 "Task 3",
-                4000,
+                1900,
                 (void *)&measure_square_wave_freq_params,
-                LOW_PRIORITY,
+                10,
                 NULL);
 
     constexpr TaskParams::TaskParams analogue_read_params = {ANALOGUE_INPUT, TASK_4_PERIOD};
     xTaskCreate(RtosTasks::analogue_read,
                 "Task 4",
-                100000,
+                1450,
                 (void *)&analogue_read_params,
                 LOW_PRIORITY,
                 NULL);
@@ -93,7 +93,7 @@ void create_rtos_tasks()
     constexpr TaskParams::TaskParams filter_analogue_signal_params = {TASK_5_PERIOD};
     xTaskCreate(RtosTasks::compute_filtered_analogue_signal,
                 "Task 5",
-                100000,
+                1448,
                 (void *)&filter_analogue_signal_params,
                 LOW_PRIORITY,
                 NULL);
@@ -101,7 +101,7 @@ void create_rtos_tasks()
     constexpr TaskParams::TaskParams no_op_params = {TASK_6_PERIOD};
     xTaskCreate(RtosTasks::execute_no_op_instruction,
                 "Task 6",
-                100000,
+                1450,
                 (void *)&no_op_params,
                 LOW_PRIORITY,
                 NULL);
@@ -111,7 +111,7 @@ void create_rtos_tasks()
     TaskHandle_t visualiseHandle = NULL;
     xTaskCreate(RtosTasks::visualise_error_code,
                 "Task 8",
-                10000,
+                1548,
                 (void *)&visualise_error_code_params,
                 4,
                 &visualiseHandle);
@@ -119,7 +119,7 @@ void create_rtos_tasks()
     TaskParams::TaskParamsWithMailbox compute_error_code_params = {ERROR_CODE_LED, TASK_7_PERIOD, {visualiseHandle}};
     xTaskCreate(RtosTasks::compute_error_code,
                 "Task 7",
-                10000,
+                1500,
                 (void *)&compute_error_code_params,
                 5,
                 NULL);
@@ -127,7 +127,7 @@ void create_rtos_tasks()
     constexpr TaskParams::TaskParams log_params = {TASK_9_PERIOD};
     xTaskCreate(RtosTasks::log,
                 "Task 9",
-                4000,
+                1548,
                 (void *)&log_params,
                 MEDIUM_PRIORITY,
                 NULL);
@@ -135,5 +135,5 @@ void create_rtos_tasks()
 
 void loop()
 {
-    vTaskDelete(NULL); // delete Arduino loop(). FreeRTOS tasks are used instead.
+    vTaskDelete(nullptr); // delete Arduino loop(). FreeRTOS tasks are used instead.
 }
