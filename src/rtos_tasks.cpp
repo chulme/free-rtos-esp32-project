@@ -23,7 +23,7 @@ namespace RtosTasks
         for (;;)
         {
             Tasks::start_pulse(p.pin_id);
-            vTaskDelay(period_to_number_of_ticks_to_sleep(p.pulse_duration)); // investigate delaying for microseconds
+            delayMicroseconds(static_cast<uint32_t>(p.pulse_duration)); // investigate delaying for microseconds
             Tasks::stop_pulse(p.pin_id);
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
@@ -34,19 +34,27 @@ namespace RtosTasks
         constexpr auto WAIT_TIME = 10.0;
         for (;;)
         {
+            constexpr int8_t MONITOR_DISPLAY_PIN = 22;
+            digitalWrite(MONITOR_DISPLAY_PIN, HIGH);
             const auto button_pressed = Tasks::digital_read(p.pin_id);
             data_to_log.set_digital_input_state(button_pressed, period_to_number_of_ticks_to_sleep(WAIT_TIME));
+
+            digitalWrite(MONITOR_DISPLAY_PIN, LOW);
+
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }
+
     void measure_square_wave_frequency(void *params)
     {
         const auto p = *(TaskParams::TaskParams *)params;
-        constexpr auto ticks_to_wait = period_to_number_of_ticks_to_sleep(100.0);
+        constexpr auto ticks_to_wait = period_to_number_of_ticks_to_sleep(1000.0);
+
         for (;;)
         {
             const auto freq = Tasks::measure_square_wave_frequency(p.pin_id);
             data_to_log.set_square_wave_frequency(freq, ticks_to_wait);
+
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }
@@ -61,6 +69,7 @@ namespace RtosTasks
             analogue_readings[analogue_index] = Tasks::analogue_read(p.pin_id);
             analogue_index = (analogue_index + 1) % Tasks::NUMBER_OF_ANALOGUE_READINGS; // circually increment counter
             xQueueOverwrite(analogue_readings_queue, (void *)&analogue_readings);
+
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }
@@ -92,6 +101,7 @@ namespace RtosTasks
                     xQueueSend(avg_analogue_readings, (void *)&average_analogue_reading, 0);
                     isQueueFull = static_cast<bool>(!uxQueueSpacesAvailable(avg_analogue_readings));
                 }
+
                 data_to_log.set_filtered_analogue_signal(average_analogue_reading, ticks_to_wait);
             }
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
@@ -106,6 +116,7 @@ namespace RtosTasks
         for (;;)
         {
             Tasks::execute_no_op_instruction(NUMBER_OF_NOP_INSTRUCTIONS);
+
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }
@@ -124,6 +135,7 @@ namespace RtosTasks
                 for (const auto &task : p.tasks)
                     xTaskNotify(task, static_cast<uint32_t>(err), eSetValueWithOverwrite);
             }
+
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }
@@ -167,6 +179,7 @@ namespace RtosTasks
             {
                 Serial.println("Unable to log, data not accessible.");
             }
+
             vTaskDelay(period_to_number_of_ticks_to_sleep(p.task_period));
         }
     }
